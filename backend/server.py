@@ -88,7 +88,7 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
         for _, row in route_cities_df.iterrows():
             route_cities.setdefault(row["route"], []).append(row["city"])
         
-        route_trucktypes = [{"route": str(i[0]), "truck_type": str(i[1])} for i in list(route_trucktypes_df[["route", "truck_type"]].itertuples(index=False, name=None))]
+        route_trucktypes = [(i[0], i[1]) for i in list(route_trucktypes_df[["route", "truck_type"]].itertuples(index=False, name=None))]
         
         capacity = {}
         cost = {}
