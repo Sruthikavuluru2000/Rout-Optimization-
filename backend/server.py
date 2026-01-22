@@ -280,9 +280,13 @@ async def upload_excel(file: UploadFile = File(...)):
     try:
         data = parse_excel_file(tmp_path)
         
-        # Convert tuples to lists for JSON serialization
+        # Convert tuples to lists/strings for JSON serialization
         serializable_data = data.copy()
         serializable_data["route_trucktypes"] = [[rt[0], rt[1]] for rt in data["route_trucktypes"]]
+        
+        # Convert tuple keys to string keys for capacity and cost
+        serializable_data["capacity"] = {f"{k[0]}|{k[1]}": v for k, v in data["capacity"].items()}
+        serializable_data["cost"] = {f"{k[0]}|{k[1]}": v for k, v in data["cost"].items()}
         
         # Store in session or return validation result
         return {
