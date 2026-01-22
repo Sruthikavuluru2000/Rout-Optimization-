@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-22T10:36:54.597831",
+  "timestamp": "2026-01-22T10:38:29.565211",
   "total_tests": 6,
   "passed_tests": 3,
   "success_rate": 50.0,
@@ -17,7 +17,7 @@
     {
       "test": "Sample Excel Creation",
       "success": true,
-      "details": "Created: /tmp/tmpqwr_av9j.xlsx"
+      "details": "Created: /tmp/tmp497y4riy.xlsx"
     },
     {
       "test": "Excel Upload & Validation",
