@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-01-22T10:38:29.565211",
+  "timestamp": "2026-01-22T10:39:21.258358",
   "total_tests": 6,
-  "passed_tests": 3,
-  "success_rate": 50.0,
+  "passed_tests": 6,
+  "success_rate": 100.0,
   "test_details": [
     {
       "test": "API Health Check",
@@ -17,22 +17,22 @@
     {
       "test": "Sample Excel Creation",
       "success": true,
-      "details": "Created: /tmp/tmp497y4riy.xlsx"
+      "details": "Created: /tmp/tmplh9898en.xlsx"
     },
     {
       "test": "Excel Upload & Validation",
-      "success": false,
-      "details": "Status: 520, Response: Internal Server Error"
+      "success": true,
+      "details": "Status: 200, Cities: 5, Routes: 3"
     },
     {
       "test": "Route Optimization",
-      "success": false,
-      "details": "No file data provided"
+      "success": true,
+      "details": "Status: 200, Total Cost: 5500.0, Routes: 3"
     },
     {
       "test": "Results Export",
-      "success": false,
-      "details": "No optimization data provided"
+      "success": true,
+      "details": "Status: 200, Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, Size: 6821 bytes"
     }
   ]
 }
