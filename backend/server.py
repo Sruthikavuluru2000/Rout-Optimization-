@@ -308,11 +308,19 @@ async def upload_excel(file: UploadFile = File(...)):
 async def run_optimization(file_data: Dict[str, Any]):
     """Run route optimization"""
     try:
-        # Convert route_trucktypes back to tuples if they were serialized as lists
-        if file_data.get("route_trucktypes") and isinstance(file_data["route_trucktypes"][0], list):
-            file_data["route_trucktypes"] = [(rt[0], rt[1]) for rt in file_data["route_trucktypes"]]
+        # Convert serialized data back to original format
+        processed_data = file_data.copy()
         
-        result = optimize_routes(file_data)
+        # Convert route_trucktypes back to tuples if they were serialized as lists
+        if processed_data.get("route_trucktypes") and isinstance(processed_data["route_trucktypes"][0], list):
+            processed_data["route_trucktypes"] = [(rt[0], rt[1]) for rt in processed_data["route_trucktypes"]]
+        
+        # Convert string keys back to tuple keys for capacity and cost
+        if isinstance(list(processed_data.get("capacity", {}).keys())[0], str):
+            processed_data["capacity"] = {tuple(k.split("|")): v for k, v in processed_data["capacity"].items()}
+            processed_data["cost"] = {tuple(k.split("|")): v for k, v in processed_data["cost"].items()}
+        
+        result = optimize_routes(processed_data)
         
         # Save to database
         result_obj = OptimizationResult(**result)
