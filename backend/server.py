@@ -279,6 +279,11 @@ async def upload_excel(file: UploadFile = File(...)):
     
     try:
         data = parse_excel_file(tmp_path)
+        
+        # Convert tuples to lists for JSON serialization
+        serializable_data = data.copy()
+        serializable_data["route_trucktypes"] = [[rt[0], rt[1]] for rt in data["route_trucktypes"]]
+        
         # Store in session or return validation result
         return {
             "success": True,
@@ -288,7 +293,7 @@ async def upload_excel(file: UploadFile = File(...)):
                 "routes_count": len(data["routes"]),
                 "truck_types": data["truck_types"]
             },
-            "file_data": data
+            "file_data": serializable_data
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error parsing Excel: {str(e)}")
