@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-01-22T10:36:54.597831",
+  "total_tests": 6,
+  "passed_tests": 3,
+  "success_rate": 50.0,
+  "test_details": [
+    {
+      "test": "API Health Check",
+      "success": true,
+      "details": "Status: 200, Response: {\"message\":\"Route Optimization API\"}"
+    },
+    {
+      "test": "Invalid File Format Rejection",
+      "success": true,
+      "details": "Status: 400, Response: {\"detail\":\"Only Excel files are allowed\"}"
+    },
+    {
+      "test": "Sample Excel Creation",
+      "success": true,
+      "details": "Created: /tmp/tmpqwr_av9j.xlsx"
+    },
+    {
+      "test": "Excel Upload & Validation",
+      "success": false,
+      "details": "Status: 520, Response: Internal Server Error"
+    },
+    {
+      "test": "Route Optimization",
+      "success": false,
+      "details": "No file data provided"
+    },
+    {
+      "test": "Results Export",
+      "success": false,
+      "details": "No optimization data provided"
+    }
+  ]
+}
