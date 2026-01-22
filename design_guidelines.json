@@ -1,0 +1,129 @@
+{
+  "identity": {
+    "name": "OptiRoute Prime",
+    "persona": "The Performance Pro",
+    "vibe": "Industrial Precision, Data-Dense, High-Contrast",
+    "archetype": "Swiss & High-Contrast"
+  },
+  "typography": {
+    "primary_font": "Inter",
+    "heading_font": "Barlow Condensed",
+    "mono_font": "JetBrains Mono",
+    "scale": {
+      "h1": "text-4xl font-bold tracking-tight uppercase",
+      "h2": "text-2xl font-semibold tracking-tight",
+      "h3": "text-xl font-medium tracking-normal",
+      "body": "text-sm leading-relaxed",
+      "mono": "font-mono text-xs tracking-wide"
+    },
+    "instructions": "Use Barlow Condensed for all section headers and metric labels. Use JetBrains Mono for ALL numerical data (costs, weights, demand). Use Inter for general UI text."
+  },
+  "colors": {
+    "palette": {
+      "primary": "#0F172A",
+      "secondary": "#F1F5F9",
+      "accent": "#3B82F6",
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "danger": "#EF4444",
+      "background": "#FFFFFF",
+      "surface": "#F8FAFC",
+      "border": "#E2E8F0"
+    },
+    "usage": {
+      "primary": "Sidebar, Primary Buttons, Strong Headings",
+      "accent": "Active States, Links, Key Metrics",
+      "surface": "Card Backgrounds, Table Headers",
+      "border": "Grid lines, Dividers"
+    },
+    "map_colors": {
+      "route_1": "#3B82F6",
+      "route_2": "#F59E0B",
+      "route_3": "#10B981",
+      "route_4": "#8B5CF6",
+      "route_5": "#EC4899",
+      "route_6": "#6366F1"
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid Mode B (High Density)",
+    "spacing": {
+      "container_padding": "p-6 md:p-8",
+      "element_gap": "gap-4",
+      "section_gap": "gap-8"
+    },
+    "structure": {
+      "dashboard": "grid grid-cols-12 gap-4 h-screen overflow-hidden",
+      "sidebar": "col-span-2 h-full border-r bg-slate-900 text-white hidden md:block",
+      "main_content": "col-span-12 md:col-span-10 h-full overflow-y-auto bg-slate-50",
+      "map_container": "h-[500px] w-full rounded-xl overflow-hidden border shadow-sm relative"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-slate-900 text-white hover:bg-slate-800 rounded-md px-4 py-2 font-medium transition-all shadow-sm hover:shadow-md active:scale-95",
+      "secondary": "bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 rounded-md px-4 py-2 font-medium transition-all",
+      "ghost": "bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md px-3 py-1.5 transition-colors"
+    },
+    "cards": {
+      "base": "bg-white border border-slate-200 rounded-xl shadow-sm p-6",
+      "metric": "bg-white border border-slate-100 rounded-lg p-4 flex flex-col gap-1 hover:border-slate-300 transition-colors"
+    },
+    "inputs": {
+      "base": "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+      "file_upload": "border-2 border-dashed border-slate-300 rounded-xl p-12 flex flex-col items-center justify-center text-center hover:border-blue-500 hover:bg-blue-50/50 transition-all cursor-pointer group"
+    },
+    "tables": {
+      "wrapper": "w-full overflow-auto rounded-lg border border-slate-200 bg-white",
+      "header": "bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200",
+      "row": "border-b border-slate-100 hover:bg-slate-50/50 transition-colors",
+      "cell": "p-3 text-sm text-slate-700"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-md bg-white/80 border border-white/20 shadow-lg",
+    "shadows": "shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+    "borders": "border border-slate-200",
+    "gradients": "None. Use solid colors for clarity."
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "mapping": {
+        "dashboard": "LayoutDashboard",
+        "upload": "UploadCloud",
+        "truck": "Truck",
+        "route": "Map",
+        "cost": "DollarSign",
+        "settings": "Settings",
+        "download": "FileDownloader",
+        "alert": "AlertCircle"
+      }
+    },
+    "images": {
+      "login_bg": "https://images.unsplash.com/photo-1724525231969-173f10849bb1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBsb2dpc3RpY3MlMjB0cnVjayUyMGhpZ2h3YXklMjB3YXJlaG91c2UlMjBjb250YWluZXIlMjBzaGlwfGVufDB8fHx8MTc2OTA3NzgyMnww&ixlib=rb-4.1.0&q=85",
+      "empty_state": "https://images.unsplash.com/photo-1705239738282-84924db4b056?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBsb2dpc3RpY3MlMjB0cnVjayUyMGhpZ2h3YXklMjB3YXJlaG91c2UlMjBjb250YWluZXIlMjBzaGlwfGVufDB8fHx8MTc2OTA3NzgyMnww&ixlib=rb-4.1.0&q=85"
+    }
+  },
+  "map_integration": {
+    "library": "react-leaflet",
+    "tile_layer": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    "attribution": "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>",
+    "style": "h-full w-full z-0"
+  },
+  "universal_guidelines": {
+    "general": [
+      "Do not use gradients for backgrounds; use solid colors or subtle noise.",
+      "Ensure all interactive elements have a hover state.",
+      "Use 'sonner' for all toast notifications.",
+      "All inputs and buttons must have data-testid attributes.",
+      "Use 'Barlow Condensed' for all headings to give an industrial feel."
+    ],
+    "accessibility": [
+      "Ensure text contrast ratio is at least 4.5:1.",
+      "Focus states must be clearly visible (ring-2 ring-offset-2).",
+      "Do not rely on color alone to convey status (use icons + text)."
+    ]
+  },
+  "instructions_to_main_agent": "1. Install 'lucide-react', 'recharts', 'react-leaflet', 'leaflet', 'clsx', 'tailwind-merge'. 2. Create a 'Layout' component that includes the Sidebar and Topbar. 3. Use the 'Upload' component for the Excel file input. 4. Visualize the optimization results using a combination of 'Cards' for summary metrics and 'Table' for detailed route data. 5. Implement the Map using React Leaflet with the specified CartoDB tiles. 6. Ensure the 'Barlow Condensed' font is imported from Google Fonts in index.css."
+}
