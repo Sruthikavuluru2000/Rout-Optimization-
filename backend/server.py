@@ -304,6 +304,10 @@ async def upload_excel(file: UploadFile = File(...)):
 async def run_optimization(file_data: Dict[str, Any]):
     """Run route optimization"""
     try:
+        # Convert route_trucktypes back to tuples if they were serialized as lists
+        if file_data.get("route_trucktypes") and isinstance(file_data["route_trucktypes"][0], list):
+            file_data["route_trucktypes"] = [(rt[0], rt[1]) for rt in file_data["route_trucktypes"]]
+        
         result = optimize_routes(file_data)
         
         # Save to database
