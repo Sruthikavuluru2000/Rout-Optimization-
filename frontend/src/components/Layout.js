@@ -1,4 +1,4 @@
-import { LayoutDashboard, Truck, Map, Settings } from 'lucide-react';
+import { LayoutDashboard, Truck, Map, Settings, FolderKanban } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const Layout = ({ children }) => {
@@ -26,6 +26,17 @@ const Layout = ({ children }) => {
             </a>
             
             <a 
+              href="/scenarios" 
+              data-testid="nav-scenarios"
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                location.pathname === '/scenarios' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-slate-800'
+              }`}
+            >
+              <FolderKanban className="w-5 h-5" />
+              <span className="text-sm font-medium">Scenarios</span>
+            </a>
+            
+            <a 
               href="/results" 
               data-testid="nav-results"
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
@@ -41,7 +52,7 @@ const Layout = ({ children }) => {
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-slate-700">
           <div className="flex items-center gap-3 text-gray-400 text-xs">
             <Settings className="w-4 h-4" />
-            <span>v1.0.0</span>
+            <span>v1.1.0</span>
           </div>
         </div>
       </div>
