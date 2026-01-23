@@ -94,6 +94,44 @@ const ComparePage = () => {
         </div>
       )}
 
+      {/* Input Data Comparison */}
+      <div className="mb-8 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+        <h2 className="text-xl font-semibold tracking-tight mb-4" style={{ fontFamily: 'Barlow Condensed, sans-serif' }}>
+          INPUT DATA COMPARISON
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {comparison.scenarios.map((scenario, idx) => (
+            <div key={idx} className="border border-slate-200 rounded-lg p-4">
+              <h3 className="font-semibold text-slate-900 mb-3">{scenario.name}</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Cities:</span>
+                  <span className="font-mono font-medium">{scenario.input_data?.cities?.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Routes:</span>
+                  <span className="font-mono font-medium">{scenario.input_data?.routes?.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Truck Types:</span>
+                  <span className="font-mono font-medium">{scenario.input_data?.truck_types?.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Total Demand:</span>
+                  <span className="font-mono font-medium">
+                    {Object.values(scenario.input_data?.demand || {}).reduce((a, b) => a + b, 0).toFixed(0)}
+                  </span>
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-200">
+                  <p className="text-xs text-slate-500 font-semibold mb-1">Route-Truck Combinations:</p>
+                  <p className="text-sm font-mono">{scenario.input_data?.route_trucktypes?.length || 0}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Metrics Comparison */}
       {hasResults && (
         <div className="mb-8 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
