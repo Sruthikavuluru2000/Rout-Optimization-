@@ -63,9 +63,14 @@ const ResultsPage = ({ data, onReset }) => {
 
   const { summary_metrics, routes_selected, city_coordinates } = data;
 
+  // Get warehouse from data
+  const warehouse = data.warehouse || null;
+
   // Calculate map center
   const cityCoords = Object.values(city_coordinates || {});
-  const mapCenter = cityCoords.length > 0
+  const mapCenter = warehouse && warehouse.lat && warehouse.long
+    ? [warehouse.lat, warehouse.long]
+    : cityCoords.length > 0
     ? [
         cityCoords.reduce((sum, c) => sum + c[0], 0) / cityCoords.length,
         cityCoords.reduce((sum, c) => sum + c[1], 0) / cityCoords.length,
