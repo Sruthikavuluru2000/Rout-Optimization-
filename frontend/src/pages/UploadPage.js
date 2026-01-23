@@ -278,6 +278,67 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData, loadedSc
           </div>
         </div>
       </div>
+
+      {/* Save Scenario Modal */}
+      {showSaveModal && (
+        <div className=\"fixed inset-0 bg-black/50 flex items-center justify-center z-50\" data-testid=\"save-scenario-modal\">
+          <div className=\"bg-white rounded-xl shadow-2xl p-6 w-full max-w-md\">
+            <div className=\"flex items-center gap-3 mb-4\">
+              <Save className=\"w-6 h-6 text-blue-500\" />
+              <h3 className=\"text-xl font-semibold\">Save Scenario</h3>
+            </div>
+            
+            <div className=\"space-y-4 mb-6\">
+              <div>
+                <label className=\"block text-sm font-medium text-slate-700 mb-2\">
+                  Scenario Name *
+                </label>
+                <input
+                  type=\"text\"
+                  value={scenarioName}
+                  onChange={(e) => setScenarioName(e.target.value)}
+                  placeholder=\"e.g., Q1 2025 Routes\"
+                  className=\"w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500\"
+                  data-testid=\"scenario-name-input\"
+                  autoFocus
+                />
+              </div>
+              
+              <div>
+                <label className=\"block text-sm font-medium text-slate-700 mb-2\">
+                  Description (Optional)
+                </label>
+                <textarea
+                  value={scenarioDescription}
+                  onChange={(e) => setScenarioDescription(e.target.value)}
+                  placeholder=\"Add notes about this scenario...\"
+                  rows={3}
+                  className=\"w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500\"
+                  data-testid=\"scenario-description-input\"
+                />
+              </div>
+            </div>
+            
+            <div className=\"flex gap-3\">
+              <button
+                onClick={handleSkipSave}
+                className=\"flex-1 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-md px-4 py-2 font-medium transition-all\"
+                data-testid=\"skip-save-button\"
+              >
+                Skip
+              </button>
+              <button
+                onClick={handleSaveScenario}
+                className=\"flex-1 bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 font-medium transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2\"
+                data-testid=\"save-scenario-button\"
+              >
+                <Save className=\"w-4 h-4\" />
+                {loadedScenario ? 'Update' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
