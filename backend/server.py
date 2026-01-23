@@ -288,6 +288,14 @@ async def upload_excel(file: UploadFile = File(...)):
         serializable_data["capacity"] = {f"{k[0]}|{k[1]}": v for k, v in data["capacity"].items()}
         serializable_data["cost"] = {f"{k[0]}|{k[1]}": v for k, v in data["cost"].items()}
         
+        # Clean NaN/Infinity values from coordinates
+        import math
+        for key in ['lat_dict', 'long_dict']:
+            serializable_data[key] = {
+                k: (v if isinstance(v, (int, float)) and math.isfinite(v) else 0)
+                for k, v in serializable_data[key].items()
+            }
+        
         # Store in session or return validation result
         return {
             "success": True,
