@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UploadCloud, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, Download } from 'lucide-react';
+import { UploadCloud, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, Download, Save } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData }) => {
+const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData, loadedScenario, onScenarioSaved }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [validationResult, setValidationResult] = useState(null);
   const [optimizing, setOptimizing] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [scenarioName, setScenarioName] = useState('');
+  const [scenarioDescription, setScenarioDescription] = useState('');
+  const [lastOptimizationResult, setLastOptimizationResult] = useState(null);
   const navigate = useNavigate();
 
   // Remove the useEffect that was causing issues
