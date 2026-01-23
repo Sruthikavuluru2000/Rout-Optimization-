@@ -181,21 +181,39 @@ const ResultsPage = ({ data, onReset }) => {
               {routes_selected?.map((route, idx) => {
                 const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
                 const cities = route.sorted_cities || [];
-                const coords = cities
+                const cityCoords = cities
                   .map(city => city_coordinates?.[city])
                   .filter(c => c);
 
+                // Create COMPLETE LOOP: Warehouse → Cities → Warehouse
+                let loopCoords = [];
+                if (warehouse && warehouse.lat && warehouse.long) {
+                  // Start at warehouse
+                  loopCoords.push([warehouse.lat, warehouse.long]);
+                  // Add all cities
+                  loopCoords = loopCoords.concat(cityCoords);
+                  // Return to warehouse (complete the loop)
+                  loopCoords.push([warehouse.lat, warehouse.long]);
+                } else {
+                  // No warehouse, just connect cities
+                  loopCoords = cityCoords;
+                }
+
                 return (
                   <div key={route.route_id}>
-                    {coords.length > 1 && (
+                    {/* Draw COMPLETE LOOP including warehouse */}
+                    {loopCoords.length > 1 && (
                       <Polyline
-                        positions={coords}
+                        positions={loopCoords}
                         color={color}
                         weight={3}
                         opacity={0.8}
+                        dashArray={warehouse ? "10, 5" : null}
                       />
                     )}
-                    {coords.map((coord, i) => (
+                    
+                    {/* City markers */}
+                    {cityCoords.map((coord, i) => (
                       <CircleMarker
                         key={i}
                         center={coord}
