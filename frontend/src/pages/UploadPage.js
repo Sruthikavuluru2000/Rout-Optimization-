@@ -47,6 +47,8 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData }) => {
       });
 
       if (response.data.success) {
+        console.log('Upload response:', response.data);
+        console.log('Cities count:', response.data.data?.cities_count);
         setValidationResult(response.data);
         onDataUploaded(response.data.file_data);
         toast.success('File uploaded and validated successfully!');
