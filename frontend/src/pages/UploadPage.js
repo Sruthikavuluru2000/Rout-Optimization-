@@ -303,11 +303,12 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData, loadedSc
               <h4 className="text-sm font-semibold text-blue-900 mb-1">Excel File Format</h4>
               <p className="text-xs text-blue-800 mb-2">Your Excel file should contain these sheets:</p>
               <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+                <li><strong>Warehouse (optional):</strong> columns - warehouse, lat, long (starting point for all routes)</li>
                 <li><strong>Cities:</strong> columns - city, demand, lat (optional), long (optional)</li>
                 <li><strong>Route_Cities:</strong> columns - route, city</li>
                 <li><strong>Route_TruckTypes:</strong> columns - route, truck_type, capacity, cost</li>
               </ul>
-              <p className="text-xs text-blue-700 mt-2 italic">Note: If lat/long are not provided, cities will be auto-geocoded.</p>
+              <p className="text-xs text-blue-700 mt-2 italic">Download template to see example with warehouse in Hyderabad</p>
             </div>
           </div>
         </div>
