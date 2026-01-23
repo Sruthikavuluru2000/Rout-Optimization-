@@ -269,21 +269,55 @@ const ComparePage = () => {
                     {results.routes_selected?.map((route, routeIdx) => {
                       const color = ROUTE_COLORS[routeIdx % ROUTE_COLORS.length];
                       const cities = route.sorted_cities || [];
-                      const coords = cities
+                      const cityCoords = cities
                         .map(city => results.city_coordinates?.[city])
                         .filter(c => c);
 
+                      // Create COMPLETE LOOP with warehouse
+                      let loopCoords = [];
+                      const warehouse = results.warehouse;
+                      if (warehouse && warehouse.lat && warehouse.long) {
+                        loopCoords.push([warehouse.lat, warehouse.long]);
+                        loopCoords = loopCoords.concat(cityCoords);
+                        loopCoords.push([warehouse.lat, warehouse.long]);
+                      } else {
+                        loopCoords = cityCoords;
+                      }
+
                       return (
                         <div key={route.route_id}>
-                          {coords.length > 1 && (
+                          {/* Complete loop line */}
+                          {loopCoords.length > 1 && (
                             <Polyline
-                              positions={coords}
+                              positions={loopCoords}
                               color={color}
                               weight={3}
                               opacity={0.8}
+                              dashArray={warehouse ? "10, 5" : null}
                             />
                           )}
-                          {coords.map((coord, i) => (
+                          
+                          {/* Warehouse marker */}
+                          {warehouse && warehouse.lat && warehouse.long && routeIdx === 0 && (
+                            <CircleMarker
+                              center={[warehouse.lat, warehouse.long]}
+                              radius={10}
+                              fillColor="#DC2626"
+                              color="white"
+                              weight={2}
+                              fillOpacity={0.9}
+                            >
+                              <Popup>
+                                <div className="text-xs">
+                                  <strong>🏭 WAREHOUSE</strong><br />
+                                  {warehouse.name}
+                                </div>
+                              </Popup>
+                            </CircleMarker>
+                          )}
+                          
+                          {/* City markers */}
+                          {cityCoords.map((coord, i) => (
                             <CircleMarker
                               key={i}
                               center={coord}
