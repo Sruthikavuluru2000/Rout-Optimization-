@@ -286,7 +286,12 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
         "total_cost": summary_metrics["total_cost"],
         "routes_selected": routes_selected,
         "summary_metrics": summary_metrics,
-        "city_coordinates": city_coordinates
+        "city_coordinates": city_coordinates,
+        "warehouse": {
+            "name": data.get("warehouse", {}).get("name") if data.get("warehouse") else None,
+            "lat": data.get("warehouse", {}).get("lat") if data.get("warehouse") else None,
+            "long": data.get("warehouse", {}).get("long") if data.get("warehouse") else None
+        } if data.get("warehouse") else None
     }
 
 @api_router.post("/upload-excel")
