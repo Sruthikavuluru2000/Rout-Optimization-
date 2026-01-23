@@ -321,7 +321,8 @@ async def upload_excel(file: UploadFile = File(...)):
             "data": {
                 "cities_count": len(data["cities"]),
                 "routes_count": len(data["routes"]),
-                "truck_types": data["truck_types"]
+                "truck_types": data["truck_types"],
+                "warehouse": data.get("warehouse")
             },
             "file_data": serializable_data
         }
