@@ -85,15 +85,58 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData, loadedSc
 
     try {
       const response = await axios.post(`${API}/optimize`, validationResult.file_data);
+      setLastOptimizationResult(response.data);
       onOptimizationComplete(response.data);
       toast.success('Optimization completed successfully!');
-      navigate('/results');
+      
+      // Show save modal
+      setShowSaveModal(true);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Optimization failed');
       console.error('Optimization error:', error);
     } finally {
       setOptimizing(false);
     }
+  };
+
+  const handleSaveScenario = async () => {
+    if (!scenarioName.trim()) {
+      toast.error('Please enter a scenario name');
+      return;
+    }
+
+    try {
+      const scenarioData = {
+        name: scenarioName,
+        description: scenarioDescription,
+        input_data: validationResult.file_data,
+        optimization_results: lastOptimizationResult
+      };
+
+      if (loadedScenario) {
+        // Update existing scenario
+        await axios.put(`${API}/scenarios/${loadedScenario.id}`, scenarioData);
+        toast.success('Scenario updated successfully!');
+      } else {
+        // Create new scenario
+        await axios.post(`${API}/scenarios`, scenarioData);
+        toast.success('Scenario saved successfully!');
+      }
+
+      setShowSaveModal(false);
+      setScenarioName('');
+      setScenarioDescription('');
+      if (onScenarioSaved) onScenarioSaved();
+      navigate('/results');
+    } catch (error) {
+      toast.error('Failed to save scenario');
+      console.error(error);
+    }
+  };
+
+  const handleSkipSave = () => {
+    setShowSaveModal(false);
+    navigate('/results');
   };
 
   const handleDownloadTemplate = () => {
