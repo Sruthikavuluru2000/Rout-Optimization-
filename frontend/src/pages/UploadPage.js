@@ -14,11 +14,12 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData }) => {
   const [optimizing, setOptimizing] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (fileData) {
-      setValidationResult(fileData);
-    }
-  }, [fileData]);
+  // Remove the useEffect that was causing issues
+  // useEffect(() => {
+  //   if (fileData) {
+  //     setValidationResult(fileData);
+  //   }
+  // }, [fileData]);
 
   const handleFileSelect = (e) => {
     const selectedFile = e.target.files[0];
