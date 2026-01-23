@@ -260,6 +260,24 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData, loadedSc
               </div>
             </div>
 
+            {validationResult.data?.warehouse && (
+              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h4 className="text-sm font-semibold text-blue-900">Warehouse (Starting Point)</h4>
+                </div>
+                <p className="text-sm text-blue-800">
+                  <strong>{validationResult.data.warehouse.name}</strong>
+                  {validationResult.data.warehouse.lat && validationResult.data.warehouse.long && (
+                    <span className="text-xs ml-2">
+                      ({validationResult.data.warehouse.lat.toFixed(4)}, {validationResult.data.warehouse.long.toFixed(4)})
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-blue-700 mt-1">All routes start and end at this warehouse</p>
+              </div>
+            )}
+
             <button
               onClick={handleOptimize}
               disabled={optimizing}
