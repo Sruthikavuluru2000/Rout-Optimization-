@@ -76,7 +76,21 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
     sheet_names = xl.sheet_names
     logging.info(f"Sheet names found: {sheet_names}")
     
+    # Try to detect format
     if "Cities" in sheet_names and "Route_Cities" in sheet_names:
+        # Read warehouse if exists
+        warehouse_name = None
+        warehouse_lat = None
+        warehouse_long = None
+        
+        if "Warehouse" in sheet_names:
+            warehouse_df = pd.read_excel(xl, "Warehouse")
+            if len(warehouse_df) > 0:
+                warehouse_name = warehouse_df["warehouse"].iloc[0]
+                warehouse_lat = float(warehouse_df["lat"].iloc[0])
+                warehouse_long = float(warehouse_df["long"].iloc[0])
+                logging.info(f"Warehouse found: {warehouse_name} at ({warehouse_lat}, {warehouse_long})")
+        
         cities_df = pd.read_excel(xl, "Cities")
         route_cities_df = pd.read_excel(xl, "Route_Cities")
         route_trucktypes_df = pd.read_excel(xl, "Route_TruckTypes")
@@ -115,7 +129,7 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
             cost[key] = int(row["cost"])
             
     else:
-        raise HTTPException(status_code=400, detail="Unsupported Excel format. Expected sheets: Cities, Route_Cities, Route_TruckTypes")
+        raise HTTPException(status_code=400, detail="Unsupported Excel format. Expected sheets: Warehouse (optional), Cities, Route_Cities, Route_TruckTypes")
     
     return {
         "cities": cities,
@@ -127,7 +141,12 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
         "route_cities": route_cities,
         "route_trucktypes": route_trucktypes,
         "capacity": capacity,
-        "cost": cost
+        "cost": cost,
+        "warehouse": {
+            "name": warehouse_name,
+            "lat": warehouse_lat,
+            "long": warehouse_long
+        } if warehouse_name else None
     }
 
 def haversine(coord1: tuple, coord2: tuple) -> float:
