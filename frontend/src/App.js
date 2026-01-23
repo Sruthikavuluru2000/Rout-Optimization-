@@ -7,6 +7,8 @@ import UploadPage from "./pages/UploadPage";
 import ResultsPage from "./pages/ResultsPage";
 import ScenariosPage from "./pages/ScenariosPage";
 import ComparePage from "./pages/ComparePage";
+import EditScenarioPage from "./pages/EditScenarioPage";
+import MultiUploadPage from "./pages/MultiUploadPage";
 
 function App() {
   const [optimizationData, setOptimizationData] = useState(null);
@@ -62,6 +64,8 @@ function App() {
               } 
             />
             <Route path="/compare" element={<ComparePage />} />
+            <Route path="/edit-scenario" element={<EditScenarioPage />} />
+            <Route path="/multi-upload" element={<MultiUploadPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
