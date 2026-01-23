@@ -56,6 +56,7 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
     """Parse uploaded Excel file and return structured data"""
     xl = pd.ExcelFile(file_path)
     sheet_names = xl.sheet_names
+    logging.info(f"Sheet names found: {sheet_names}")
     
     # Try to detect format
     if "Cities" in sheet_names and "Route_Cities" in sheet_names:
@@ -66,6 +67,7 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
         
         cities = cities_df["city"].tolist()
         demand = dict(zip(cities_df["city"], cities_df["demand"]))
+        logging.info(f"Parsed {len(cities)} cities")
         
         # Check if lat/long exist
         if "lat" in cities_df.columns and "long" in cities_df.columns:
@@ -83,6 +85,7 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
         
         routes = list(set(route_cities_df["route"]))
         truck_types = list(set(route_trucktypes_df["truck_type"]))
+        logging.info(f"Parsed {len(routes)} routes and {len(truck_types)} truck types")
         
         route_cities = {}
         for _, row in route_cities_df.iterrows():
