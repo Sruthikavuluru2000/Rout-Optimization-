@@ -172,7 +172,16 @@ const ScenariosPage = ({ onLoadScenario }) => {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-1">{scenario.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-slate-900">{scenario.name}</h3>
+                    <button
+                      onClick={() => handleRename(scenario.id, scenario.name)}
+                      className="text-slate-400 hover:text-slate-600"
+                      title="Rename scenario"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                  </div>
                   {scenario.description && (
                     <p className="text-sm text-slate-600 mb-2">{scenario.description}</p>
                   )}
