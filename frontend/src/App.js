@@ -5,10 +5,21 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import UploadPage from "./pages/UploadPage";
 import ResultsPage from "./pages/ResultsPage";
+import ScenariosPage from "./pages/ScenariosPage";
+import ComparePage from "./pages/ComparePage";
 
 function App() {
   const [optimizationData, setOptimizationData] = useState(null);
   const [fileData, setFileData] = useState(null);
+  const [loadedScenario, setLoadedScenario] = useState(null);
+
+  const handleLoadScenario = (scenario) => {
+    setLoadedScenario(scenario);
+    setFileData(scenario.input_data);
+    if (scenario.optimization_results) {
+      setOptimizationData(scenario.optimization_results);
+    }
+  };
 
   return (
     <div className="App">
@@ -24,6 +35,8 @@ function App() {
                     setOptimizationData(data);
                   }}
                   fileData={fileData}
+                  loadedScenario={loadedScenario}
+                  onScenarioSaved={() => setLoadedScenario(null)}
                 />
               } 
             />
@@ -35,10 +48,20 @@ function App() {
                   onReset={() => {
                     setOptimizationData(null);
                     setFileData(null);
+                    setLoadedScenario(null);
                   }}
                 />
               } 
             />
+            <Route 
+              path="/scenarios" 
+              element={
+                <ScenariosPage 
+                  onLoadScenario={handleLoadScenario}
+                />
+              } 
+            />
+            <Route path="/compare" element={<ComparePage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
