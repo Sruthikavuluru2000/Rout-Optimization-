@@ -22,7 +22,6 @@ import xlsxwriter
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
@@ -30,7 +29,6 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-# Geocoding service
 geolocator = Nominatim(user_agent="route_optimizer_app")
 
 class OptimizationResult(BaseModel):
@@ -42,8 +40,29 @@ class OptimizationResult(BaseModel):
     city_coordinates: Dict[str, List[float]]
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class Scenario(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = ""
+    input_data: Dict[str, Any]
+    optimization_results: Optional[Dict[str, Any]] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ScenarioCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+    input_data: Dict[str, Any]
+    optimization_results: Optional[Dict[str, Any]] = None
+
+class ScenarioUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    input_data: Optional[Dict[str, Any]] = None
+    optimization_results: Optional[Dict[str, Any]] = None
+
 def geocode_city(city_name: str) -> Optional[tuple]:
-    """Geocode city name to lat/long"""
     try:
         location = geolocator.geocode(f"{city_name}, India")
         if location:
@@ -53,14 +72,11 @@ def geocode_city(city_name: str) -> Optional[tuple]:
     return None
 
 def parse_excel_file(file_path: str) -> Dict[str, Any]:
-    """Parse uploaded Excel file and return structured data"""
     xl = pd.ExcelFile(file_path)
     sheet_names = xl.sheet_names
     logging.info(f"Sheet names found: {sheet_names}")
     
-    # Try to detect format
     if "Cities" in sheet_names and "Route_Cities" in sheet_names:
-        # Format from first notebook (normalized)
         cities_df = pd.read_excel(xl, "Cities")
         route_cities_df = pd.read_excel(xl, "Route_Cities")
         route_trucktypes_df = pd.read_excel(xl, "Route_TruckTypes")
@@ -69,12 +85,10 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
         demand = dict(zip(cities_df["city"], cities_df["demand"]))
         logging.info(f"Parsed {len(cities)} cities")
         
-        # Check if lat/long exist
         if "lat" in cities_df.columns and "long" in cities_df.columns:
             lat_dict = dict(zip(cities_df["city"], cities_df["lat"]))
             long_dict = dict(zip(cities_df["city"], cities_df["long"]))
         else:
-            # Geocode cities
             lat_dict = {}
             long_dict = {}
             for city in cities:
@@ -117,7 +131,6 @@ def parse_excel_file(file_path: str) -> Dict[str, Any]:
     }
 
 def haversine(coord1: tuple, coord2: tuple) -> float:
-    """Calculate distance between two coordinates in km"""
     R = 6371
     lat1, lon1 = math.radians(coord1[0]), math.radians(coord1[1])
     lat2, lon2 = math.radians(coord2[0]), math.radians(coord2[1])
@@ -128,7 +141,6 @@ def haversine(coord1: tuple, coord2: tuple) -> float:
     return R * c
 
 def sort_cities_nearest_neighbor(cities: List[str], coords: Dict[str, tuple], start: Optional[str] = None) -> List[str]:
-    """Order cities using nearest neighbor heuristic"""
     if not cities:
         return []
     
@@ -149,7 +161,6 @@ def sort_cities_nearest_neighbor(cities: List[str], coords: Dict[str, tuple], st
     return route
 
 def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Run OR-Tools optimization"""
     cities = data["cities"]
     demand = data["demand"]
     routes = data["routes"]
@@ -160,7 +171,6 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
     lat_dict = data["lat_dict"]
     long_dict = data["long_dict"]
     
-    # Build OR-Tools model
     solver = pywraplp.Solver.CreateSolver('SCIP')
     if not solver:
         raise HTTPException(status_code=500, detail="SCIP solver not available")
@@ -168,37 +178,31 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
     x = {}
     y = {}
     
-    # Decision variables
     for rt in route_trucktypes:
         x[rt] = solver.IntVar(0, solver.infinity(), f'x_{rt}')
         for c in route_cities[rt[0]]:
             y[rt, c] = solver.NumVar(0, solver.infinity(), f'y_{rt}_{c}')
     
-    # Constraint: Demand satisfaction
     for c in cities:
         solver.Add(
             sum(y[rt, c] for rt in route_trucktypes if c in route_cities[rt[0]]) >= demand[c]
         )
     
-    # Constraint: Route capacity
     for rt in route_trucktypes:
         r = rt[0]
         solver.Add(
             sum(y[rt, c] for c in route_cities[r]) <= x[rt] * capacity[rt]
         )
     
-    # Objective: Minimize cost
     solver.Minimize(
         sum(cost[rt] * x[rt] for rt in route_trucktypes)
     )
     
-    # Solve
     status = solver.Solve()
     
     if status != pywraplp.Solver.OPTIMAL:
         raise HTTPException(status_code=500, detail="No optimal solution found")
     
-    # Extract results
     routes_selected = []
     total_trucks = 0
     total_capacity_used = 0
@@ -226,7 +230,6 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
                     total_delivered += qty
             
             if cities_delivered:
-                # Sort cities by nearest neighbor
                 city_names = [cd["city"] for cd in cities_delivered]
                 sorted_cities = sort_cities_nearest_neighbor(city_names, coords)
                 
@@ -246,7 +249,6 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
                 total_trucks += trucks_used
                 total_capacity_used += total_delivered
     
-    # Prepare city coordinates for map
     city_coordinates = {}
     for city in cities:
         if city in lat_dict and city in long_dict:
@@ -270,11 +272,9 @@ def optimize_routes(data: Dict[str, Any]) -> Dict[str, Any]:
 
 @api_router.post("/upload-excel")
 async def upload_excel(file: UploadFile = File(...)):
-    """Upload and parse Excel file"""
     if not file.filename.endswith(('.xlsx', '.xls')):
         raise HTTPException(status_code=400, detail="Only Excel files are allowed")
     
-    # Save temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         content = await file.read()
         tmp.write(content)
@@ -283,15 +283,12 @@ async def upload_excel(file: UploadFile = File(...)):
     try:
         data = parse_excel_file(tmp_path)
         
-        # Convert tuples to lists/strings for JSON serialization
         serializable_data = data.copy()
         serializable_data["route_trucktypes"] = [[rt[0], rt[1]] for rt in data["route_trucktypes"]]
         
-        # Convert tuple keys to string keys for capacity and cost
         serializable_data["capacity"] = {f"{k[0]}|{k[1]}": v for k, v in data["capacity"].items()}
         serializable_data["cost"] = {f"{k[0]}|{k[1]}": v for k, v in data["cost"].items()}
         
-        # Clean NaN/Infinity values from coordinates
         import math
         for key in ['lat_dict', 'long_dict']:
             serializable_data[key] = {
@@ -299,7 +296,6 @@ async def upload_excel(file: UploadFile = File(...)):
                 for k, v in serializable_data[key].items()
             }
         
-        # Store in session or return validation result
         return {
             "success": True,
             "message": "File uploaded and validated successfully",
@@ -317,23 +313,18 @@ async def upload_excel(file: UploadFile = File(...)):
 
 @api_router.post("/optimize")
 async def run_optimization(file_data: Dict[str, Any]):
-    """Run route optimization"""
     try:
-        # Convert serialized data back to original format
         processed_data = file_data.copy()
         
-        # Convert route_trucktypes back to tuples if they were serialized as lists
         if processed_data.get("route_trucktypes") and isinstance(processed_data["route_trucktypes"][0], list):
             processed_data["route_trucktypes"] = [(rt[0], rt[1]) for rt in processed_data["route_trucktypes"]]
         
-        # Convert string keys back to tuple keys for capacity and cost
         if isinstance(list(processed_data.get("capacity", {}).keys())[0], str):
             processed_data["capacity"] = {tuple(k.split("|")): v for k, v in processed_data["capacity"].items()}
             processed_data["cost"] = {tuple(k.split("|")): v for k, v in processed_data["cost"].items()}
         
         result = optimize_routes(processed_data)
         
-        # Save to database
         result_obj = OptimizationResult(**result)
         doc = result_obj.model_dump()
         doc['timestamp'] = doc['timestamp'].isoformat()
@@ -346,13 +337,10 @@ async def run_optimization(file_data: Dict[str, Any]):
 
 @api_router.post("/export-results")
 async def export_results(results_data: Dict[str, Any]):
-    """Export optimization results to Excel"""
     try:
-        # Create Excel file
         output_path = f"/tmp/optimization_results_{uuid.uuid4()}.xlsx"
         workbook = xlsxwriter.Workbook(output_path)
         
-        # Summary sheet
         summary_sheet = workbook.add_worksheet("Summary")
         summary_sheet.write(0, 0, "Metric")
         summary_sheet.write(0, 1, "Value")
@@ -364,7 +352,6 @@ async def export_results(results_data: Dict[str, Any]):
             summary_sheet.write(row, 1, value)
             row += 1
         
-        # Routes sheet
         routes_sheet = workbook.add_worksheet("Routes")
         headers = ["Route ID", "Truck Type", "Trucks Used", "Capacity", "Cost per Truck", "Total Cost", "Total Delivered", "Capacity Utilization %"]
         for col, header in enumerate(headers):
@@ -382,7 +369,6 @@ async def export_results(results_data: Dict[str, Any]):
             routes_sheet.write(row, 7, route["capacity_utilization"])
             row += 1
         
-        # City deliveries sheet
         deliveries_sheet = workbook.add_worksheet("City Deliveries")
         deliveries_sheet.write(0, 0, "Route ID")
         deliveries_sheet.write(0, 1, "Truck Type")
@@ -409,6 +395,113 @@ async def export_results(results_data: Dict[str, Any]):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+
+# Scenario Management Endpoints
+@api_router.post("/scenarios", response_model=Scenario)
+async def create_scenario(scenario: ScenarioCreate):
+    scenario_obj = Scenario(**scenario.model_dump())
+    doc = scenario_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    await db.scenarios.insert_one(doc)
+    return scenario_obj
+
+@api_router.get("/scenarios", response_model=List[Scenario])
+async def list_scenarios():
+    scenarios = await db.scenarios.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    for scenario in scenarios:
+        if isinstance(scenario['created_at'], str):
+            scenario['created_at'] = datetime.fromisoformat(scenario['created_at'])
+        if isinstance(scenario['updated_at'], str):
+            scenario['updated_at'] = datetime.fromisoformat(scenario['updated_at'])
+    return scenarios
+
+@api_router.get("/scenarios/{scenario_id}", response_model=Scenario)
+async def get_scenario(scenario_id: str):
+    scenario = await db.scenarios.find_one({"id": scenario_id}, {"_id": 0})
+    if not scenario:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    if isinstance(scenario['created_at'], str):
+        scenario['created_at'] = datetime.fromisoformat(scenario['created_at'])
+    if isinstance(scenario['updated_at'], str):
+        scenario['updated_at'] = datetime.fromisoformat(scenario['updated_at'])
+    return scenario
+
+@api_router.put("/scenarios/{scenario_id}", response_model=Scenario)
+async def update_scenario(scenario_id: str, update: ScenarioUpdate):
+    scenario = await db.scenarios.find_one({"id": scenario_id}, {"_id": 0})
+    if not scenario:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.scenarios.update_one({"id": scenario_id}, {"$set": update_data})
+    
+    updated_scenario = await db.scenarios.find_one({"id": scenario_id}, {"_id": 0})
+    if isinstance(updated_scenario['created_at'], str):
+        updated_scenario['created_at'] = datetime.fromisoformat(updated_scenario['created_at'])
+    if isinstance(updated_scenario['updated_at'], str):
+        updated_scenario['updated_at'] = datetime.fromisoformat(updated_scenario['updated_at'])
+    return updated_scenario
+
+@api_router.delete("/scenarios/{scenario_id}")
+async def delete_scenario(scenario_id: str):
+    result = await db.scenarios.delete_one({"id": scenario_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    return {"message": "Scenario deleted successfully"}
+
+@api_router.post("/scenarios/{scenario_id}/duplicate", response_model=Scenario)
+async def duplicate_scenario(scenario_id: str, new_name: str):
+    original = await db.scenarios.find_one({"id": scenario_id}, {"_id": 0})
+    if not original:
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    
+    duplicate_data = ScenarioCreate(
+        name=new_name,
+        description=f"Copy of {original['name']}",
+        input_data=original["input_data"],
+        optimization_results=None
+    )
+    
+    new_scenario = Scenario(**duplicate_data.model_dump())
+    doc = new_scenario.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    await db.scenarios.insert_one(doc)
+    return new_scenario
+
+@api_router.post("/scenarios/compare")
+async def compare_scenarios(scenario_ids: List[str]):
+    if len(scenario_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least 2 scenarios required for comparison")
+    
+    scenarios = []
+    for scenario_id in scenario_ids:
+        scenario = await db.scenarios.find_one({"id": scenario_id}, {"_id": 0})
+        if not scenario:
+            raise HTTPException(status_code=404, detail=f"Scenario {scenario_id} not found")
+        scenarios.append(scenario)
+    
+    comparison = {
+        "scenarios": scenarios,
+        "comparison_metrics": []
+    }
+    
+    for scenario in scenarios:
+        if scenario.get("optimization_results"):
+            metrics = scenario["optimization_results"].get("summary_metrics", {})
+            comparison["comparison_metrics"].append({
+                "scenario_id": scenario["id"],
+                "scenario_name": scenario["name"],
+                "total_cost": metrics.get("total_cost", 0),
+                "total_trucks": metrics.get("total_trucks", 0),
+                "routes_optimized": metrics.get("routes_optimized", 0),
+                "capacity_used": metrics.get("total_capacity_used", 0)
+            })
+    
+    return comparison
 
 @api_router.get("/")
 async def root():
