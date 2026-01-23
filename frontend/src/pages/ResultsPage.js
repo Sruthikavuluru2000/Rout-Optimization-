@@ -158,6 +158,26 @@ const ResultsPage = ({ data, onReset }) => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               />
               
+              {/* Warehouse Marker */}
+              {warehouse && warehouse.lat && warehouse.long && (
+                <CircleMarker
+                  center={[warehouse.lat, warehouse.long]}
+                  radius={12}
+                  fillColor="#DC2626"
+                  color="white"
+                  weight={3}
+                  fillOpacity={0.9}
+                >
+                  <Popup>
+                    <div className="text-xs">
+                      <strong>🏭 WAREHOUSE</strong><br />
+                      {warehouse.name}<br />
+                      <span className="text-slate-500">Starting point for all routes</span>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              )}
+              
               {routes_selected?.map((route, idx) => {
                 const color = ROUTE_COLORS[idx % ROUTE_COLORS.length];
                 const cities = route.sorted_cities || [];
