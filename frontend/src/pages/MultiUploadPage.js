@@ -60,7 +60,7 @@ const MultiUploadPage = () => {
         const optimizeResponse = await axios.post(`${API}/optimize`, uploadResponse.data.file_data);
 
         // Create scenario
-        const scenarioName = file.name.replace(/\\.xlsx?$/i, '');
+        const scenarioName = file.name.replace(/\.xlsx?$/i, '');
         const scenarioData = {
           name: scenarioName,
           description: `Auto-created from ${file.name}`,
