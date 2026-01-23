@@ -55,8 +55,20 @@ const ScenariosPage = ({ onLoadScenario }) => {
   };
 
   const handleLoadScenario = (scenario) => {
-    onLoadScenario(scenario);
-    navigate('/');
+    navigate('/edit-scenario', { state: { scenario } });
+  };
+
+  const handleRename = async (scenarioId, currentName) => {
+    const newName = prompt('Enter new name for scenario:', currentName);
+    if (!newName || newName === currentName) return;
+    
+    try {
+      await axios.put(`${API}/scenarios/${scenarioId}`, { name: newName });
+      toast.success('Scenario renamed');
+      loadScenarios();
+    } catch (error) {
+      toast.error('Failed to rename scenario');
+    }
   };
 
   const handleViewResults = (scenario) => {
