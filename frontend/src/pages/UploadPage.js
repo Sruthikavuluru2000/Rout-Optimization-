@@ -48,10 +48,22 @@ const UploadPage = ({ onDataUploaded, onOptimizationComplete, fileData }) => {
       });
 
       if (response.data.success) {
-        console.log('Upload response:', response.data);
-        console.log('Cities count:', response.data.data?.cities_count);
-        setValidationResult(response.data);
-        onDataUploaded(response.data.file_data);
+        console.log('Full Upload response:', JSON.stringify(response.data, null, 2));
+        const result = response.data;
+        
+        // Ensure the structure is correct
+        if (!result.data) {
+          console.error('Missing data property in response');
+          toast.error('Invalid response from server');
+          return;
+        }
+        
+        console.log('Cities count from response:', result.data.cities_count);
+        console.log('Routes count from response:', result.data.routes_count);
+        console.log('Truck types from response:', result.data.truck_types);
+        
+        setValidationResult(result);
+        onDataUploaded(result.file_data);
         toast.success('File uploaded and validated successfully!');
       }
     } catch (error) {
